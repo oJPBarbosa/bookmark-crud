@@ -1,3 +1,6 @@
+// todo: refactor tests
+// todo: add more tests
+// (I've been doing this shit for the last two whole days)
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { Test, TestingModule } from '@nestjs/testing';
