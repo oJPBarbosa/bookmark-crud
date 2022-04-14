@@ -1,6 +1,4 @@
-// todo: refactor tests
 // todo: add more tests
-// (I've been doing this shit for the last two whole days)
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -249,19 +247,19 @@ describe('App E2E Tests', (): void => {
     });
   });
 
-  describe('/users', (): void => {
+  describe('/users', async (): Promise<void> => {
+    const { data }: { data: { token: string } } = await client.post(
+      '/auth/signin',
+      {
+        email: 'john@doe.com',
+        password: 'johndoe',
+      },
+    );
+
+    const { token }: { token: string } = data;
+
     describe('GET /me', (): void => {
       it('should return a user', async (): Promise<void> => {
-        const { data }: { data: { token: string } } = await client.post(
-          '/auth/signin',
-          {
-            email: 'john@doe.com',
-            password: 'johndoe',
-          },
-        );
-
-        const { token }: { token: string } = data;
-
         const response: AxiosResponse = await client.get('/users/me', {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -275,16 +273,6 @@ describe('App E2E Tests', (): void => {
 
     describe('PATCH /me', (): void => {
       it('should update a user', async (): Promise<void> => {
-        const { data }: { data: { token: string } } = await client.post(
-          '/auth/signin',
-          {
-            email: 'john@doe.com',
-            password: 'johndoe',
-          },
-        );
-
-        const { token }: { token: string } = data;
-
         const response: AxiosResponse = await client.patch(
           '/users/me',
           {
@@ -313,11 +301,16 @@ describe('App E2E Tests', (): void => {
     });
   });
 
-  describe('/bookmarks', (): void => {
-    const user: { email: string; password: string } = {
-      email: 'foo@bar.com',
-      password: 'foobar',
-    };
+  describe('/bookmarks', async (): Promise<void> => {
+    const { data }: { data: { token: string } } = await client.post(
+      '/auth/signin',
+      {
+        email: 'foo@bar.com',
+        password: 'foobar',
+      },
+    );
+
+    const { token }: { token: string } = data;
 
     const bookmark: {
       url: string;
@@ -332,13 +325,6 @@ describe('App E2E Tests', (): void => {
 
     describe('POST /', (): void => {
       it('should return a bookmark', async (): Promise<void> => {
-        const { data }: { data: { token: string } } = await client.post(
-          '/auth/signin',
-          user,
-        );
-
-        const { token }: { token: string } = data;
-
         const response: AxiosResponse = await client.post(
           '/bookmarks',
           bookmark,
@@ -357,13 +343,6 @@ describe('App E2E Tests', (): void => {
 
     describe('GET /', (): void => {
       it('should return all user bookmarks', async (): Promise<void> => {
-        const { data }: { data: { token: string } } = await client.post(
-          '/auth/signin',
-          user,
-        );
-
-        const { token }: { token: string } = data;
-
         const response: AxiosResponse = await client.get('/bookmarks', {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -381,13 +360,6 @@ describe('App E2E Tests', (): void => {
 
     describe('GET /bookmarks/:id', (): void => {
       it('should return an user bookmark', async (): Promise<void> => {
-        const { data }: { data: { token: string } } = await client.post(
-          '/auth/signin',
-          user,
-        );
-
-        const { token }: { token: string } = data;
-
         const response: AxiosResponse = await client.get(`/bookmarks/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -404,13 +376,6 @@ describe('App E2E Tests', (): void => {
 
     describe('PATCH /bookmarks/:id', (): void => {
       it('should update an user bookmark', async (): Promise<void> => {
-        const { data }: { data: { token: string } } = await client.post(
-          '/auth/signin',
-          user,
-        );
-
-        const { token }: { token: string } = data;
-
         const response: AxiosResponse = await client.patch(
           `/bookmarks/${id}`,
           {
@@ -434,13 +399,6 @@ describe('App E2E Tests', (): void => {
 
     describe('DELETE /bookmarks/:id', (): void => {
       it('should delete an user bookmark', async (): Promise<void> => {
-        const { data }: { data: { token: string } } = await client.post(
-          '/auth/signin',
-          user,
-        );
-
-        const { token }: { token: string } = data;
-
         const response: AxiosResponse = await client.delete(
           `/bookmarks/${id}`,
           {
